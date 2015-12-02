@@ -42,10 +42,15 @@ var L= React.createFactory(Link)
 var LI= React.createFactory(ListItem)
 var MD= React.createFactory(Markdown)
 var T= React.createFactory(Text)
+
 var layout= React.createFactory(Layout)
 var fit= React.createFactory(Fit)
 var fill= React.createFactory(Fill)
 var code= React.createFactory(CodePane)
+var blockQuote= React.createFactory(BlockQuote)
+var quote= React.createFactory(Quote)
+var cite= React.createFactory(Cite)
+
 var br= React.createFactory("br")
 var div= React.createFactory("div")
 var span= React.createFactory("span")
@@ -75,17 +80,16 @@ function ssl(section){
 	return L({href}, href)
 }
 var specSlug= "Generic Event Delivery Using HTTP Push"
-var WP= Hb(null,
-		L({href: spec},
-			 "WebPush"))
+var _WP= L({href: spec}, "WebPush")
+var WP= Hb(null, _WP)
 var HTTP= <Heading big>HTTP2</Heading>
 
 
 var webpushAway= ()=> {
 	var draft= T(null, L({href: spec}, "draft-ietf-webpush-protocol-02"))
 	return S(null, 
-		H({size:0.6}, "Hi. Welcome to"),
-		H({caps:1}, "WebPush Away."),
+		T(null, "Hi. Welcome to"),
+		H({caps:true}, "WebPush Away."),
 		T(null, "This is a talk on"),
 		WP,
 		draft,
@@ -93,14 +97,11 @@ var webpushAway= ()=> {
 	)
 }()
 
-
-
 var rad= (notes)=> {
 	return S({notes},
+		H(null, "It*'s"),
+		Hb(null, "rad"),
 		A0(null,
-			H(null, "It*'s"),
-			Hb(null, "rad")),
-		A1(null,
 			T(null, "*Webpush."),
 			T(null, "But this talk is too."),
 			T(null, "But not as rad as")))
@@ -108,26 +109,129 @@ var rad= (notes)=> {
 
 var radSpec= (notes)=> {
 	return S(notes,
-		A0(null, WP),
-		A1(null,
+		WP,
+		A0(null,
 			T(null, specSlug)))
 }()
 
-var bigQueue= (notes)=> {
+var webQueue= (notes)=> {
 	return S({notes},
-		A0(null,
-			H(null, "Because"),
+		T(null, "Rad because"),
+		WP,
+		T(null, "is a"),
+		H(null, "web queue"))
+}()
+
+
+var queuesGreat= (notes)=> {
+	return S({notes},
+			T(null, "And queues are"),
+			H(null, "Great"),
+			br(),
+			A0(null,
+				layout(null,
+					fill(null, 
+						T(null, "Kafka")),
+					fill(null,
+						T(null, "RabbitMQ")))),
+			A1(null,
+				blockQuote({bgColor: "black"},
+					quote(null, "It is known"),
+					cite(null, "Everyone"))))
+}()
+
+var webGreat= (notes)=> {
+	return S({notes},
+		T(null, "The"),
+		H(null, "Web"),
+		T(null, "is"),
+		H(null, "Great"))
+}()
+
+var shouldGreat= (notes)=> {
+	return S({notes},
+		T(null, "So a web queue?"),
+		T(null, "Should be great"))
+}()
+
+var has= (notes)=> {
+	return S({notes},
+		T(null, "And WebPush?"),
+		Hb(null, "Has:"))
+}()
+
+var magic= (notes)=> {
+	return S({notes},
+		Hbf(null, "MAGIC!"))
+}()
+
+var httpMagic= (notes)=> {
+	return S({notes},
+		layout(null,
+			fill(null,
+				L(null,
+					LI(null, "HTTP2 magic!"),
+					LI(null, A0(null, "Push magic!")),
+					LI(null, A1(null, "Great magic")))),
+			fill(null,
+				L(null,
+					LI(null, A2(null, "* Not actually magic")),
+					LI(null, A3(null, "** But actually push")),
+					LI(null, A4(null, "*** Probably still great"))))),
+		A5(null, T(null, "Worth talking about")))
+}()
+
+var probablyGreat= (notes)=> {
+	return S({notes},
+		H(null, "Probably great"))
+}()
+var order= (n)=> {
+	return (notes)=> {
+		return S({notes},
 			WP,
-			T(null, "is a web queue")),
-		A1(null,
-			T(null, "And queues are")),
-		A2(null,
-			Hb(null, "Great")))
-}(`
-WebPush is a big queue.
-And queues are great.
-They send stuff! Put something in a queue, and get it from elsewhere.
+			L(null,
+				LI(null, "Origins: Push API"),
+				LI(null, "Design: Web resources"),
+				LI(null, "Implementation: HTTP2 Push")),
+			T(null, A0(null,
+				T(null, "So this will be"),
+				H(null, "Epic"))))
+	}
+}
+
+var overview= order(null)(`I'm Matthew Fowle, I'm here to talk about a super interesting protocol
+for declaring a queue. I'll talk some about how it's used (PushAPI)
+but more so, I want to talk about how WebPush makes use of HTTP2
+, because it's super neat and totally new and wasn't possible before
+And I want to talk about resources and resourcefulness
+Because that's elemental to the web
+And because when we model the resources we're talking about with good standards
+We get interesting systems, that we can put to interesting uses.
 `)
+
+
+/*
+		Thank you all for attending,
+		I'm Matthew Fowle
+		It's been a long time since I've track B'd it at JSConf
+		I'm still unbelievably jazzed about the web
+		And how the user agent makes itself visible to the world
+
+		WebPush hails from that realm.
+		Of the user agent being more visible.
+		It was made as a standard way to implement Push API
+		The Push API and Web Push Protocol deal with the same topic:
+		Creating a push service,
+		Where a sender (in Push API, a application server) can send
+		And a receiver (in Push API, a browser) can receive
+		By talking to a "push service," a server acting as a queue
+*/
+
+
+// And WebPush?
+// It's a great queue
+// 
+
 
 
 var series= (notes)=> {
@@ -150,18 +254,12 @@ var series= (notes)=> {
 // please, stick around and enjoy WebPush Away!
 
 
-var webGreat= (notes)=> {
-	return S({notes},
-		A0(null, T("The web is")),
-		A1(null, Hb("Great")))
-}()
-
 var webPushGreat= (notes)=> {
 	return S({notes},
 		WP,
 		T(null, "is a great queue"),
 		T(null, "for a great"),
-		Hg(null, "Web"))
+		Hb(null, "Web"))
 }()
 
 
@@ -293,13 +391,15 @@ render(
 			{webpushAway}
 			{rad}
 			{radSpec}
-			{bigQueue}
-			{s4_really}
-			{s5}
-			{s6}
-			{s7}
-			{s8}
-			{s9_created}
+			{webQueue}
+			{queuesGreat}
+			{webGreat}
+			{shouldGreat}
+			{has}
+			{magic}
+			{httpMagic}
+			{probablyGreat}
+			{overview}
 			<Slide>
 				<Heading big>Really great.</Heading>
 			</Slide>
