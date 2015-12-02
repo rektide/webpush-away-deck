@@ -22,10 +22,170 @@ const images = {
 
 preloader([images.city, images.kat, images.markdown]);
 
+var defaulter= function(fn, opts){
+	return function(o){
+		for(var i in opts){
+			if( o[i]=== undefined){
+				o[i]= opts[i]
+			}
+		}
+		return fn.apply(null, arguments)
+	}
+}
+
+var S= React.createFactory(Slide)
+var H= React.createFactory(Heading)
+var A= React.createFactory(Appear)
+var L= React.createFactory(Link)
+var T= React.createFactory(Text)
+
+var A1= defaulter(A, {fid: 1})
+var A2= defaulter(A, {fid: 1})
+var A3= defaulter(A, {fid: 1})
+var A4= defaulter(A, {fid: 1})
+
+var m= 0.6 // medium
+
+var spec= "https://tools.ietf.org/html/draft-ietf-webpush-protocol-02"
+var specSlug= "Generic Event Delivery Using HTTP Push"
+var WP= H(null,
+		L({href: spec},
+			 "WebPush"))
+var HTTP= <Heading big>HTTP2</Heading>
+
+var s1= ()=> {
+	var draft= T(null, L({href: spec}, "draft-ietf-webpush-protocol-02"))
+	return S(null, 
+		H({size:0.6}, "Hi. Welcome to"),
+		H({caps:1}, "WebPush Away."),
+		T(null, "This is a talk on"),
+		WP,
+		draft,
+		T(null, slug)
+	)
+}()
+
+var s2= ()=> {
+	
+}()
+
 render(
 	<Spectacle>
-		<Deck transition={["zoom", "slide"]} transitionDuration={500}>
-			<Slide transition={["zoom"]} bgColor="primary">
+		<Deck transition={["zoom"]} transitionDuration={288}>
+			{s1}
+			<Slide bgColor="primary" notes="">
+				<Heading size={0.6} caps>
+					Hi. Welcome to
+				</Heading>
+				<Heading caps>
+					WebPush Away.
+				</Heading>
+				<Text>
+					This is a talk on 
+				</Text>
+				<Heading>
+					<Link href="https://tools.ietf.org/html/draft-ietf-webpush-protocol-02">
+						WebPush
+					</Link>
+				</Heading>
+				<Text>
+					<Link href="https://tools.ietf.org/html/draft-ietf-webpush-protocol-02">
+ 						draft-ietf-webpush-protocol-02
+					</Link><br/>
+					Generic Event Delivery Using HTTP Push
+				</Text>
+			</Slide>
+			<Slide>
+				<Heading>It's*</Heading>
+				<Heading big>rad</Heading>
+				<Text>*WebPush. But this talk too.</Text>
+				<Text>But not as rad as</Text>
+				<Text>WebPush</Text>
+			</Slide>
+			<Slide>
+				<Heading>Because WebPush is a</Heading>
+				<Heading big>queue</Heading>
+			</Slide>
+			<Slide>
+				<Heading>And queues are</Heading>
+			</Slide>
+			<Slide>
+				<Heading>Great.</Heading>
+			</Slide>
+			<Slide>
+				<Heading big>Really great.</Heading>
+			</Slide>
+			<Slide>
+				<Heading>Great like</Heading>
+			</Slide>
+			<Slide>
+				<Heading>[this] Great</Heading>
+				<iframe src=""></iframe>
+			</Slide>
+			<Slide>
+				So we're going to do it like this
+			</Slide>
+			<Slide>
+				http://steamcommunity.com/sharedfiles/filedetails/?id=563287795
+			</Slide>
+			<Slide>
+				This presentation also has
+			</Slide>
+			<Slide>
+				<Heading big>HTTP2</Heading>
+			</Slide>
+			<Slide>
+				<Appear fid={1}>
+					<Text>Which delivers resources</Text>
+				</Appear>
+				<Text>Which is great</Text>
+			</Slide>
+			<Slide>
+			</Slide>
+			<Slide>
+				<Appear fid={1}>
+					<Text>HTTP is great at delivering resources</Text>
+				</Appear>
+				<Appear fid={2}>
+					<Text>And delivering resources is what we want</Text>
+				</Appear>
+				<Appear fid={3}>
+					<Text>Cause, that's the queue working</Text>
+				</Appear>
+			</Slide>
+			<Slide>
+				HTTP2 is kind of
+			</Slide>
+			<Slide>
+				<Appear fid={1}>
+					<Heading big>HTTP2</Heading>
+					<Heading>is kind of</Heading>
+				</Appear>
+				<Appear fid={2}>
+					Companion Cube
+				</Appear>
+				http://steamcommunity.com/sharedfiles/filedetails/?id=563287795
+			</Slide>
+			<Slide>
+				So it's kind of all
+			</Slide>
+			<Slide>
+				
+			</Slide>
+			
+			
+			<Slide>
+				
+			</Slide>
+			<Slide>
+				<Heading size={0.8}>
+					That s kind of like a talk on
+				</Heading>
+				<Text>
+					Portals
+				</Text>
+			</Slide>
+			<Slide transition={["zoom"]} bgColor="primary" notes="">
 				<Heading size={1} fit caps lineHeight={1} textColor="black">
 					Spectacle
 				</Heading>

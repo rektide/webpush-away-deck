@@ -1,7 +1,9 @@
-#Spectacle
-ReactJS based Presentation Library
+#WebPush Away
 
->Note: master is out of sync with the documentation. Until 1.0.0 is released, use version [0.1.5](https://github.com/FormidableLabs/spectacle/releases/tag/0.1.5)
+A talk on WebPush Generic HTTP Event Delivery, HTTP2, Queues, Resources, and the Push API.
+
+#Spectacle
+This talk is powered by the ReactJS based presentation library *Spectacle*.
 
 ##Getting Started
 
