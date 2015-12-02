@@ -3,7 +3,7 @@ import { render } from "react-dom";
 
 import {
 	Appear, BlockQuote, Cite, CodePane, Deck, Fit, Fill,
-	Heading, Image, Layout, Link, ListItem, List, Markdown, Quote, Slide, Spectacle, Text
+	Heading, Image, Layout, Link, ListItem, List, Markdown, Quote, Slide, Spectacle, Text, S as _S
 } from "./src";
 
 import preloader from "./src/utils/preloader";
@@ -68,6 +68,11 @@ var A8= defaulter(A, {fid: 5})
 var A9= defaulter(A, {fid: 5})
 var Hb= defaulter(H, {big: true})
 var Hbf= defaulter(Hb, {fit: true})
+
+var b= defaulter(React.createFactory(_S), {type: "bold"})
+function href(href){
+	return L({href}, href)
+}
 
 var m= 0.6 // medium
 
@@ -136,32 +141,35 @@ var queuesGreat= (notes)=> {
 						T(null, "RabbitMQ")))),
 			A1(null,
 				blockQuote({bgColor: "black"},
-					quote(null, "It is known"),
+					quote(null, "\"It is known\""),
 					cite(null, "Everyone"))))
 }()
 
 var webGreat= (notes)=> {
+	var href= "http://www.w3.org/DesignIssues/Axioms.html"
 	return S({notes},
 		T(null, "The"),
 		H(null, "Web"),
 		T(null, "is"),
-		H(null, "Great"))
+		H(null, "Great."),
+		A0(null, T(null, "It has resources.")),
+		A1(null, L({href}, href)))
 }()
 
 var shouldGreat= (notes)=> {
 	return S({notes},
 		T(null, "So a web queue?"),
-		T(null, "Should be great"))
+		H(null, "Should be great"))
 }()
 
 var has= (notes)=> {
 	return S({notes},
-		T(null, "And WebPush?"),
+		H(null, _WP, "?"),
 		Hb(null, "Has:"))
 }()
 
 var magic= (notes)=> {
-	return S({notes},
+	return S({notes, bgColor: "black"},
 		Hbf(null, "MAGIC!"))
 }()
 
@@ -176,127 +184,128 @@ var httpMagic= (notes)=> {
 			fill(null,
 				L(null,
 					LI(null, A2(null, "* Not actually magic")),
-					LI(null, A3(null, "** But actually push")),
+					LI(null, A3(null, "** Actually push")),
 					LI(null, A4(null, "*** Probably still great"))))),
-		A5(null, T(null, "Worth talking about")))
+		A5(null, T({margin: "1.5em 0 0"}, "Worth talking about")))
 }()
 
 var probablyGreat= (notes)=> {
-	return S({notes},
+	return S({notes, bgColor: "black"},
 		H(null, "Probably great"))
 }()
+
+var probablyGreat2= (notes)=> {
+	return S({notes, bgColor: "black", textColor:"primary"},
+		H(null, "Probably great"),
+		A0(null, T({textColor:"primary"}, "Solid model for a queue")),
+		T({textColor:"primary"}, 
+			A1({span: true}, "Interesting innovative techniques"),
+			A2({span: true}, " (push not-magic)")),
+		A3(null, T({textColor:"primary"}, "Interesting application")),
+		A4(null, T({textColor:"primary"}, "Nicely making it through standardizing")))
+}()
+
 var order= (n)=> {
 	return (notes)=> {
+		var footer
+		if(!n){
+			footer= T({margin: "0.7em 0 0"},
+				A0(null,
+					T(null, "So this should be"),
+					H(null, "Epic")))
+
+		}
 		return S({notes},
-			WP,
-			L(null,
-				LI(null, "Origins: Push API"),
-				LI(null, "Design: Web resources"),
-				LI(null, "Implementation: HTTP2 Push")),
-			T(null, A0(null,
-				T(null, "So this will be"),
-				H(null, "Epic"))))
+			H(null, _WP, " talk outline:"),
+			L({align: "left"},
+				LI(null, "Opening: welcome", A0({span: true}, " (please learn a lot & enjoy)")),
+				LI(null, "Model: WebPush Protocol", A1({span: true}, " (resourceful)")),
+				LI(null, "Technique: HTTP2 Push", A2({span: true}, " (async)")),
+				LI(null, "Application: Push API", A3({span: true}, " (example)")),
+				LI(null, "Implementation: WebPush-Pump", A4({span: true}, " (mine)"))),
+			footer)
 	}
 }
 
-var overview= order(null)(`I'm Matthew Fowle, I'm here to talk about a super interesting protocol
-for declaring a queue. I'll talk some about how it's used (PushAPI)
-but more so, I want to talk about how WebPush makes use of HTTP2
-, because it's super neat and totally new and wasn't possible before
-And I want to talk about resources and resourcefulness
-Because that's elemental to the web
-And because when we model the resources we're talking about with good standards
-We get interesting systems, that we can put to interesting uses.
+var overview= order(null)(`<p>I'm Matthew Fowle, thank you all so much for attending.</p>
+<p>It's been a long time since I've track-B'ed it at JSConf,
+And it's obviously a bit sad being at Last Call,
+But I am still super jazzed about JavaScript, and the web, and how the user agent
+is a tangible thing to the rest of the world</p>
+<p>And I super love protocols that give us means to push data around</p>
+<p>And that we can 
+
+I'm here to talk about a super interesting protocol
+for creating, pushing into, and consuming from a queue.</p>
+<p>We'll tour through WebPush's overall model, where I'll highlight how it's resourceful, naturally a thing of the web,</p>
+<p>We'll look at how WebPush uses HTTP2 push- which is a totally new thing for the web</p>
+<p>We'll look at what need WebPush was created to serve, which is Push API, a way for
+application servers to send stuff to your browser, even if the page is closed, the browser is closed, or the device is shut off</p>
+<p>And we'll take a peak at some tricks I used to implement a Node server.</p>
 `)
 
-
-/*
-		Thank you all for attending,
-		I'm Matthew Fowle
-		It's been a long time since I've track B'd it at JSConf
-		I'm still unbelievably jazzed about the web
-		And how the user agent makes itself visible to the world
-
-		WebPush hails from that realm.
-		Of the user agent being more visible.
-		It was made as a standard way to implement Push API
-		The Push API and Web Push Protocol deal with the same topic:
-		Creating a push service,
-		Where a sender (in Push API, a application server) can send
-		And a receiver (in Push API, a browser) can receive
-		By talking to a "push service," a server acting as a queue
-*/
-
-
-// And WebPush?
-// It's a great queue
-// 
-
-
-
-var series= (notes)=> {
-	// A queue is pretty close to
-	// a series of tubes
-}()
-
-// put things in
-// get things out
-
-// a queue is pretty close to
-// [this]
-
-// things in, things out
-
-// and in addition to stuff in and stuff out
-// this talk has one other awesome
-// magic
-// http2 magic!
-// please, stick around and enjoy WebPush Away!
-
-
-var webPushGreat= (notes)=> {
+var model= (notes)=> {
 	return S({notes},
-		WP,
-		T(null, "is a great queue"),
-		T(null, "for a great"),
-		Hb(null, "Web"))
+		Hbf(null, "Model"),
+		T(null, "Webpush is a queue,"),
+		H({size: 3},
+			A0({span: true}, "So what is a queue?")))
 }()
 
-
-var beLikeTubes= (notes)=> {
-	var src= ""
+var goesInGoesOut= (notes)=> {
+	var src= "http://steamcommunity.com/sharedfiles/filedetails/?id=258816001"
 	return S({notes},
-		A0(null, Hb(null, "Queues are like")),
-		A1(null,
-			T("A series of tubes"),
-			iframe({src})))
-}()
-
-var s4_really= (notes)=> {
-	return S({notes, bgColor: "black"},
+		T({margin: "-1.5em 0 0"}, "You probably know this but"),
 		A0(null,
-			Hb(null, "Really great")))
+			H({size: 2}, "Stuff goes in")),
+		A1(null,
+			A2(null,
+				iframe({
+					src,
+					height:"600px",
+					width: "90%",
+					transform: "scale(0.4)"})),
+			H({size: 2},
+				"Stuff comes out",
+				A3({span: true}, " (eventually)"))))
+}()
+
+var resources101= (notes)=> {
+	return S({notes},
+		T(null, "Great, so what about a WebPush queue?"),
+		A0(null,
+			H({size: 3}, "It's just resources")),
+		A1(null,
+			T(null, "(things with URLs)")),
+		L(null,
+			LI(null,
+				A1(null,
+					"\"A ",
+					b(null, "subscription resource"),
+					" is used to receive messages from a subscription and to delete a subscription.\"")),
+			LI(null,
+				A2(null,
+					"\"A ",
+					b(null, "push resource"),
+					" is used to send messages to a subscription.\""))),
+		A3(null, ssl(2)))
+}()
+
+var pushService= (notes)=> {
+	return S({notes},
+		T(null, "These resources are gotten from a ", b(null, "push service":)),
+		A1(null, "\nThis resource is used to create push message subscriptions\n"))
+		
 }()
 
 
-// and- Webpush is a great queue
-// What is a queue?
-// Why is webpush a great queue?
+var create= (notes)=> {
+	return S({notes},
+		H(null, "Step 1"),
+		H({size: 3}, "Create a queue"))
+}()
 
-// Well, a queue is something you put stuff into
-// And get stuff out of
-// WebPush is great, because it's that, on the web
 
-// Ask a "push service" server
-//   for a queue
-// And it'll give it to you
-
-// See? Three pieces. In, out, and an ack (receipt)
-
-// Webpush does that
-// And it uses HTTP2
-//   in a way that makes webpush powerful
-// Webpush also 
 
 
 
@@ -332,19 +341,6 @@ var receipt= (notes)=> {
 				A5(null, T(null, "that a thing has been sent")))))
 }()
 
-var s6= (notes)=> {
-	return S({notes},
-		Hbf(null, "That's pretty great"))
-}()
-
-var httpGreat= (notes)=> {
-	return S({notes},
-		A0(null,
-			WP,
-			T(null, "is really great")))
-
-}()
-
 var s7= (notes)=> {
 	return S({notes},
 		A0(null, T(null, "WebPush is one way a queue might look on the net")),
@@ -352,7 +348,7 @@ var s7= (notes)=> {
 		A2(null, T(null, "All you have to do is <b>POST</b> to create it")))
 }()
 
-var s8= (notes)=> {
+var subscribeCode= (notes)=> {
 	var source= `POST /subscribe/ HTTP/1.1
 Host: yoyodyne.net`
 	var href= ss("4")
@@ -361,7 +357,7 @@ Host: yoyodyne.net`
 		ssl(4))
 }()
 
-var s9_created= (notes)=> {
+var subscribedCode= (notes)=> {
 	var source= `HTTP/1.1 201 Created
 Date: Thu, 11 Dec 2014 23:56:52 GMT
 Link: </p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV>;
@@ -399,13 +395,11 @@ render(
 			{magic}
 			{httpMagic}
 			{probablyGreat}
+			{probablyGreat2}
 			{overview}
-			<Slide>
-				<Heading big>Really great.</Heading>
-			</Slide>
-			<Slide>
-				<Heading>Great like</Heading>
-			</Slide>
+			{model}
+			{goesInGoesOut}
+			{resources101}
 			<Slide>
 				<Heading>[this] Great</Heading>
 				<iframe src=""></iframe>
