@@ -70,7 +70,7 @@ var Hb= defaulter(H, {big: true})
 var Hbf= defaulter(Hb, {fit: true})
 
 var b= defaulter(React.createFactory(_S), {type: "bold"})
-var b= defaulter(React.createFactory(_S), {type: "italic"})
+var i= defaulter(React.createFactory(_S), {type: "italic"})
 function href(href){
 	return L({href}, href)
 }
@@ -329,14 +329,14 @@ var subscribeRequest= (notes)=> {
 Host: yoyodyne.net`
 	var href= ss("4")
 	return S({notes},
-		H({size: 3}, "Step 1: Create a queue")
+		H({size: 3}, "Step 1: Create a queue"),
 		code({source, language: "http"}),
 		ssl(4),
 		A0(null,
 			H({size: 3}, "Simple enough?")))
 }()
 
-var subscribedReply= (notes)=> {
+var subscribeReply= (notes)=> {
 	var source= `HTTP/1.1 201 Created
 Date: Thu, 11 Dec 2014 23:56:52 GMT
 Link: </p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV>;
@@ -391,7 +391,7 @@ var p= (notes)=> {
 }()
 
 var pRequest= (notes)=> {
-	var src= `POST /p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV HTTP/1.1
+	var source= `POST /p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV HTTP/1.1
 Host: push.example.net
 Content-Type: text/plain;charset=utf8
 Content-Length: 36
@@ -421,7 +421,7 @@ Location: https://push.example.net/d/qDIYHNcfAIPP_5ITvURr-d6BGtYnTRnk`
 			"With an address the sender can look for a receipt of."))
 }()
 
-var pExtra= (notes)= {
+var pExtra= (notes)=> {
 	return S({notes},
 		H({size: 3},
 			"Pushers ",
@@ -442,13 +442,13 @@ var pExtra= (notes)= {
 					blockQuote(null,
 						quote(null,
 							"A [pusher] can use the TTL header field to limit the time ",
-							"that a push message is retained by a push service."
+							"that a push message is retained by a push service."),
 						cite(null,
-							ssl(6.2, "Push Message Time-To-Live"))))))))
-}
+							ssl(6.2, "Push Message Time-To-Live")))))))
+}()
 
 var pRequest2= (notes)=> {
-	var src= `POST /p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV HTTP/1.1
+	var source= `POST /p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV HTTP/1.1
 Host: push.example.net
 Content-Type: text/plain;charset=utf8
 Content-Length: 36
@@ -481,7 +481,7 @@ var sendingEasy= (notes)=> {
 
 var queuesAndCubes= (notes)=> {
 	
-}
+}()
 
 render(
 	<Spectacle>
