@@ -46,7 +46,7 @@ var T= React.createFactory(Text)
 var layout= React.createFactory(Layout)
 var fit= React.createFactory(Fit)
 var fill= React.createFactory(Fill)
-var code= React.createFactory(CodePane)
+var code= defaulter(React.createFactory(CodePane), {fontSize: "1.4em"})
 var blockQuote= React.createFactory(BlockQuote)
 var quote= React.createFactory(Quote)
 var cite= React.createFactory(Cite)
@@ -70,6 +70,7 @@ var Hb= defaulter(H, {big: true})
 var Hbf= defaulter(Hb, {fit: true})
 
 var b= defaulter(React.createFactory(_S), {type: "bold"})
+var b= defaulter(React.createFactory(_S), {type: "italic"})
 function href(href){
 	return L({href}, href)
 }
@@ -80,9 +81,12 @@ var spec= "https://tools.ietf.org/html/draft-ietf-webpush-protocol-02"
 function ss(section){
 	return "https://tools.ietf.org/html/draft-ietf-webpush-protocol-02#section-" + section
 }
-function ssl(section){
+function ssl(section, name){
 	var href= ss(section)
-	return L({href}, href)
+	if(name){
+		name = "§" + section + " " + name
+	}
+	return L({href}, name)
 }
 var specSlug= "Generic Event Delivery Using HTTP Push"
 var _WP= L({href: spec}, "WebPush")
@@ -271,93 +275,68 @@ var goesInGoesOut= (notes)=> {
 }()
 
 var resources101= (notes)=> {
+	var href= "https://tools.ietf.org/html/draft-ietf-webpush-protocol-02"
 	return S({notes},
 		T(null, "Great, so what about a WebPush queue?"),
 		A0(null,
 			H({size: 3}, "It's just resources")),
 		A1(null,
 			T(null, "(things with URLs)")),
-		L(null,
-			LI(null,
-				A1(null,
+		A2(null,
+			blockQuote(null,
+				quote(null,
 					"\"A ",
 					b(null, "subscription resource"),
-					" is used to receive messages from a subscription and to delete a subscription.\"")),
-			LI(null,
-				A2(null,
+					" is used to receive messages from a subscription and to delete a subscription.\""),
+				cite(
+					ssl(2)))),
+		A3(null,
+			blockQuote(null,
+				quote(null,
 					"\"A ",
 					b(null, "push resource"),
-					" is used to send messages to a subscription.\""))),
-		A3(null, ssl(2)))
+					" is used to send messages to a subscription.\"")),
+				cite(null,
+					ssl(2, "Overview"))))
 }()
 
 var pushService= (notes)=> {
 	return S({notes},
-		T(null, "These resources are gotten from a ", b(null, "push service":)),
-		A1(null, "\nThis resource is used to create push message subscriptions\n"))
-		
+		T(null,
+			"These resources are gotten from a ",
+			b(null, "push service"),
+			":"),
+		A0(null, blockQuote(null,
+			quote(null,
+				"This resource is used to create",
+				b(null, "push message subscriptions")),
+			cite(null,
+				ssl(2,1, "HTTP Resources")))))
 }()
-
 
 var create= (notes)=> {
 	return S({notes},
+		T(null, "Let's jump in"),
 		H(null, "Step 1"),
-		H({size: 3}, "Create a queue"))
+		A0(null,
+			H({size: 3}, "Create a queue")),
+		A1(null,
+			T(null, "Call the Push Service")))
 }()
 
-
-
-
-
-var s5= (notes)=> {
-	return S({notes},
-		layout({}, 
-			fit(null,
-				A0(null, T(null, "You put things"))),
-			fill(null,
-				A1(null, Hb(null, "IN"))),
-			fit(null,
-				A0(null, T(null, "a queue")))),
-		layout(null,
-			fit(
-				A2(null, T(null, "And later and/or elsewhere")),
-				A2(null, T(null, "You get things"))),
-			fill(null,
-				A3(null, Hb(null, "OUT"))),
-			fit(null,
-				A2(null, T(null, "of a a queue")))))
-}
-
-var receipt= (notes)=> {
-	return S(null,
-		A4(null,
-				T(null, "That's pretty great")),
-		layout({}, 
-			fit(null,
-				A5(null, T(null, "Perhaps a"))),
-			fill(null,
-				A6(null, Hb(null, "RECEIPT"))),
-			fit(null,
-				A5(null, T(null, "that a thing has been sent")))))
-}()
-
-var s7= (notes)=> {
-	return S({notes},
-		A0(null, T(null, "WebPush is one way a queue might look on the net")),
-		A1(null, T(null, "It provides those three resources")),
-		A2(null, T(null, "All you have to do is <b>POST</b> to create it")))
-}()
-
-var subscribeCode= (notes)=> {
+var subscribeRequest= (notes)=> {
 	var source= `POST /subscribe/ HTTP/1.1
 Host: yoyodyne.net`
 	var href= ss("4")
 	return S({notes},
-		code({source, language: "http", size: 4}),
-		ssl(4))
+		H({size: 3}, "Step 1: Create a queue")
+		code({source, language: "http"}),
+		ssl(4),
+		A0(null,
+			H({size: 3}, "Simple enough?")))
 }()
 
-var subscribedCode= (notes)=> {
+var subscribedReply= (notes)=> {
 	var source= `HTTP/1.1 201 Created
 Date: Thu, 11 Dec 2014 23:56:52 GMT
 Link: </p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV>;
@@ -366,20 +345,143 @@ Link: </receipts/xjTG79I3VuptNWS0DsFu4ihT97aE6UQJ>;
 	rel="urn:ietf:params:push:receipt"
 Location: https://push.example.net/s/LBhhw0OohO-Wl4Oi971UGsB7sdQGUibx`
 	return S({notes},
+		H({size: 3},
+			"Step 1: Create a queue",
+			A0(null, " results")),
 		A0(null,
 			code({source, language: "http"}),
 			ssl(4)),
 		A1(null, 
-			T(null, "There they are:")),
-		L(null,
-			LI(null, A2(null, "A way to push stuff in")),
-			LI(null, A3(null, "A means to hear acks")),
-			LI(null, A4(null, "A means to get stuff out"))))
+			T(null, "We get three resources:")),
+		A2(null,
+			L(null,
+				LI(null, A2(null, "A way to push stuff in (push resource)")),
+				LI(null, A3(null, "Also, means to hear acks (receipt subscribe resource)")),
+				LI(null, A4(null, "A means to get stuff out (subscription resource)")))))
 }()
 
-var s9= (notes)=> {
-	
+var queueCreated= (notes)=> {
+	return S({notes},
+		T(null, "With these resources created, we have a queue"),
+		T(null, "Maybe we want to start listening,"),
+		T(null, "Maybe we want to push."),
+		T(null, "It's a queue: order doesn't matter"))
 }()
+
+var pushNow= (notes)=> {
+	return S({notes},
+		H(null,
+			"Push. ",
+			A0(null,
+				"Push ",
+				i(null, "now"))))
+}()
+
+var p= (notes)=> {
+	return S({notes},
+		blockQuote(null,
+			quote(null,
+				"An application server requests the delivery of a push message by ",
+				"sending a HTTP request to a push resource distributed to the ",
+   				"application server by a user agent.  The push message is included in ",
+   				"the body of the request."),
+			cite(null,
+				ssl(6, "Requesting Push Message Delivery"))),
+		T(null, "And that looks like..."))
+}()
+
+var pRequest= (notes)=> {
+	var src= `POST /p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV HTTP/1.1
+Host: push.example.net
+Content-Type: text/plain;charset=utf8
+Content-Length: 36
+
+iChYuI3jMzt3ir20P8r_jgRR-dSuN182x7iB`
+	return S({notes},
+		code({source, language: "http"}),
+		ssl(6, "Requesting Push Message Delivery request"),
+		T(null,
+			"So we're POST'ing to the ",
+			b(null, "push resource"),
+			"."))
+}()
+
+var pResponse= (notes)=> {
+	var source= `HTTP/1.1 201 Created
+Date: Thu, 11 Dec 2014 23:56:55 GMT
+Location: https://push.example.net/d/qDIYHNcfAIPP_5ITvURr-d6BGtYnTRnk`
+	return S({notes},
+		code({source, language: "http"}),
+		ssl(6, "Requesting Push Message Delivery response"),
+		T(null,
+			"We get back a",
+			b(null, "push message resource"),
+			"."),
+		T(null,
+			"With an address the sender can look for a receipt of."))
+}()
+
+var pExtra= (notes)= {
+	return S({notes},
+		H({size: 3},
+			"Pushers ",
+			i(null, "may"),
+			" also:"),
+		L(null,
+			LI(null,
+				A0(null,
+					blockQuote(null,
+						quote(null,
+							"An [pusher] can use the Push-Receipt header field to ",
+							"request a confirmation from the push service when a push message is ",
+							"delivered and acknowledged by [a listener]"),
+						cite(null,
+							ssl(6.1, "Requesting Push Message Receipts"))))),
+			LI(null,
+				A1(null,
+					blockQuote(null,
+						quote(null,
+							"A [pusher] can use the TTL header field to limit the time ",
+							"that a push message is retained by a push service."
+						cite(null,
+							ssl(6.2, "Push Message Time-To-Live"))))))))
+}
+
+var pRequest2= (notes)=> {
+	var src= `POST /p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV HTTP/1.1
+Host: push.example.net
+Content-Type: text/plain;charset=utf8
+Content-Length: 36
+TTL: 3600
+Push-Receipt: https://push.example.net/r/3ZtI4YVNBnUUZhuoChl6omUvG4ZM9mpN
+
+iChYuI3jMzt3ir20P8r_jgRR-dSuN182x7iB`
+	return S({notes},
+		code({source, language: "http"}),
+		ssl(6, "Requesting Push Message Delivery request"),
+		T(null,
+			"Two new footers at the bottom, see?"),
+		T(null,
+			"TTL is easy enough."),
+		A0(null,
+			"And Push-Receipts is the url from /subscribe/"),
+		A1(null,
+			"It says who to notify when the message gets acked"))
+}()
+
+
+
+var sendingEasy= (notes)=> {
+	return S({notes},
+		T(null, "Whew,..."),
+		H({size: 3}, "Sending wasn't so bad."),
+		A0(null,
+			T(null, "Receiving?")))
+}()
+
+var queuesAndCubes= (notes)=> {
+	
+}
 
 render(
 	<Spectacle>
@@ -400,6 +502,22 @@ render(
 			{model}
 			{goesInGoesOut}
 			{resources101}
+			{pushService}
+			{create}
+			{subscribeRequest}
+			{subscribeReply}
+			{queueCreated}
+			{pushNow}
+			{p}
+			{pRequest}
+			{pResponse}
+			{pExtra}
+			{pRequest2}
+			{sendingEasy}
+			
+
+
+
 			<Slide>
 				<Heading>[this] Great</Heading>
 				<iframe src=""></iframe>
@@ -581,3 +699,46 @@ You can write inline images, [Markdown Links](http://commonmark.org), paragraph 
 		</Deck>
 	</Spectacle>
 , document.getElementById("root"));
+
+
+
+var s5= (notes)=> {
+	return S({notes},
+		layout({}, 
+			fit(null,
+				A0(null, T(null, "You put things"))),
+			fill(null,
+				A1(null, Hb(null, "IN"))),
+			fit(null,
+				A0(null, T(null, "a queue")))),
+		layout(null,
+			fit(
+				A2(null, T(null, "And later and/or elsewhere")),
+				A2(null, T(null, "You get things"))),
+			fill(null,
+				A3(null, Hb(null, "OUT"))),
+			fit(null,
+				A2(null, T(null, "of a a queue")))))
+}
+
+var receipt= (notes)=> {
+	return S(null,
+		A4(null,
+				T(null, "That's pretty great")),
+		layout({}, 
+			fit(null,
+				A5(null, T(null, "Perhaps a"))),
+			fill(null,
+				A6(null, Hb(null, "RECEIPT"))),
+			fit(null,
+				A5(null, T(null, "that a thing has been sent")))))
+}()
+
+var s7= (notes)=> {
+	return S({notes},
+		A0(null, T(null, "WebPush is one way a queue might look on the net")),
+		A1(null, T(null, "It provides those three resources")),
+		A2(null, T(null, "All you have to do is <b>POST</b> to create it")))
+}()
+
+
