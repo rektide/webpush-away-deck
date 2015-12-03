@@ -7,7 +7,8 @@ const Appear = React.createClass({
   mixins: [tweenState.Mixin],
   propTypes: {
     children: PropTypes.node,
-    style: PropTypes.object
+    style: PropTypes.object,
+    span: PropTypes.bool
   },
   contextTypes: {
     export: PropTypes.bool,
@@ -47,11 +48,19 @@ const Appear = React.createClass({
     const styles = {
       opacity: this.getTweeningValue("opacity")
     };
-    return (
-      <div style={Object.assign({}, this.props.style, styles)} className="fragment" ref="fragment">
-        {this.props.children}
-      </div>
-    );
+    if(this.props.span){
+   	 return (
+   	   <span style={Object.assign({}, this.props.style, styles)} className="fragment" ref="fragment">
+   	     {this.props.children}
+   	   </span>
+   	 );
+    }else{
+   	 return (
+   	   <div style={Object.assign({}, this.props.style, styles)} className="fragment" ref="fragment">
+   	     {this.props.children}
+   	   </div>
+   	 );
+    }
   }
 });
 
