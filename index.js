@@ -39,6 +39,7 @@ var S= React.createFactory(Slide)
 var H= React.createFactory(Heading)
 var A= React.createFactory(Appear)
 var L= React.createFactory(Link)
+var list= React.createFactory(List)
 var LI= React.createFactory(ListItem)
 var MD= React.createFactory(Markdown)
 var T= React.createFactory(Text)
@@ -46,7 +47,7 @@ var T= React.createFactory(Text)
 var layout= React.createFactory(Layout)
 var fit= React.createFactory(Fit)
 var fill= React.createFactory(Fill)
-var code= defaulter(React.createFactory(CodePane), {fontSize: "1.4em"})
+var code= defaulter(React.createFactory(CodePane), {})
 var blockQuote= React.createFactory(BlockQuote)
 var quote= React.createFactory(Quote)
 var cite= React.createFactory(Cite)
@@ -54,7 +55,8 @@ var cite= React.createFactory(Cite)
 var br= React.createFactory("br")
 var div= React.createFactory("div")
 var span= React.createFactory("span")
-var iframe= React.createFactory("iframe")
+var iframe= defaulter(React.createFactory("iframe"), {height: "520px", width: "80%"})
+var img= defaulter(React.createFactory(Image), {})
 
 var A0= defaulter(A, {fid: 1})
 var A1= defaulter(A, {fid: 2})
@@ -71,23 +73,51 @@ var Hbf= defaulter(Hb, {fit: true})
 
 var b= defaulter(React.createFactory(_S), {type: "bold"})
 var i= defaulter(React.createFactory(_S), {type: "italic"})
+function ib(more){
+	return b(null,
+		i.apply(null, arguments))
+}
 function href(href){
 	return L({href}, href)
 }
 
 var m= 0.6 // medium
+var black = {bgColor: "black"}
+var primary = {textColor: "#f9c300"}
+var span = {span: true}
+var smallQuote = {bgColor: "black", textSize: "3rem"}
+var smallerQuote = {bgColor: "black", textSize: "2.6rem"}
 
 var spec= "https://tools.ietf.org/html/draft-ietf-webpush-protocol-02"
 function ss(section){
+	section= isNaN(section) ? section : "section-" + section
 	return "https://tools.ietf.org/html/draft-ietf-webpush-protocol-02#section-" + section
 }
-function ssl(section, name){
-	var href= ss(section)
-	if(name){
-		name = "§" + section + " " + name
-	}
-	return L({href}, name)
+function _http2(section){
+	section= isNaN(section) ? section : "section-" + section
+	return "https://tools.ietf.org/html/rfc7540#" + section
 }
+
+function wrap(fn){
+	return function(section, name, primaryColor){
+		var o= {
+		  href: fn(section)
+		}
+		if(primaryColor === true){
+			o.textColor = primary.textColor
+		}
+		if(name){
+			name = "§" + section + " " + name
+		}else{
+			name = href
+		}
+		return L(o, name)
+	}
+}
+var ssl= wrap(ss)
+var http2= wrap(_http2)
+
+
 var specSlug= "Generic Event Delivery Using HTTP Push"
 var _WP= L({href: spec}, "WebPush")
 var WP= Hb(null, _WP)
@@ -146,7 +176,7 @@ var queuesGreat= (notes)=> {
 			A1(null,
 				blockQuote({bgColor: "black"},
 					quote(null, "\"It is known\""),
-					cite(null, "Everyone"))))
+					cite(null, "Everyone", true))))
 }()
 
 var webGreat= (notes)=> {
@@ -206,7 +236,19 @@ var probablyGreat2= (notes)=> {
 			A1({span: true}, "Interesting innovative techniques"),
 			A2({span: true}, " (push not-magic)")),
 		A3(null, T({textColor:"primary"}, "Interesting application")),
-		A4(null, T({textColor:"primary"}, "Nicely making it through standardizing")))
+		A4(null, T({textColor:"primary"}, "Nicely making it through standardization.")))
+}()
+
+var otherWeb= (notes)=> {
+	return S({notes},
+		H(null, "Related web transfer tech?"),
+		H({size: 3}, "Webhooks"),
+		list(null,
+			LI(null, "Not usable within browser"),
+			LI(null, "Destination has to exist on the web"),
+			LI(null, "No coherent idea of streams, of who is sending"),
+			LI(null, "Perhaps the best push the web has right now")),
+		T(null, "\"I accept data on the web\""))
 }()
 
 var order= (n)=> {
@@ -219,19 +261,32 @@ var order= (n)=> {
 					H(null, "Epic")))
 
 		}
+		var now= {
+			textSize: "3rem",
+			bold: true
+		}
+
+		var parens = n === 0
+		var p1= parens ?  A0({span: true}, " (please learn a lot & enjoy)") : null
+		var p2= parens ?  A1({span: true}, " (resourceful)") : null
+		var p3= parens ?  A2({span: true}, " (async)") : null
+		var p4= parens ?  A3({span: true}, " (reason for spec)") : null
+		var p5= parens ?  A4({span: true}, " (mine)") : null
+		var p6= parens ?  A4({span: true}, " ") : null
 		return S({notes},
 			H(null, _WP, " talk outline:"),
-			L({align: "left"},
-				LI(null, "Opening: welcome", A0({span: true}, " (please learn a lot & enjoy)")),
-				LI(null, "Model: WebPush Protocol", A1({span: true}, " (resourceful)")),
-				LI(null, "Technique: HTTP2 Push", A2({span: true}, " (async)")),
-				LI(null, "Application: Push API", A3({span: true}, " (example)")),
-				LI(null, "Implementation: WebPush-Pump", A4({span: true}, " (mine)"))),
+			list({align: "left"},
+				LI(n === 0 ? now : null, "Opening: welcome", p1),
+				LI(n === 1 ? now : null, "Model: WebPush Protocol", p2),
+				LI(n === 2 ? now : null, "Technique: HTTP2 Push", p3),
+				LI(n === 3 ? now : null, "Application: Push API", p4),
+				LI(n === 4 ? now : null, "Implementation: WebPush-Pump", p5),
+				LI(n === 5 ? now : null, "Asynchronous bi-directional web", p6)),
 			footer)
 	}
 }
 
-var overview= order(null)(`<p>I'm Matthew Fowle, thank you all so much for attending.</p>
+var overview= order(0)(`<p>I'm Matthew Fowle, thank you all so much for attending.</p>
 <p>It's been a long time since I've track-B'ed it at JSConf,
 And it's obviously a bit sad being at Last Call,
 But I am still super jazzed about JavaScript, and the web, and how the user agent
@@ -257,21 +312,17 @@ var model= (notes)=> {
 }()
 
 var goesInGoesOut= (notes)=> {
-	var src= "http://steamcommunity.com/sharedfiles/filedetails/?id=258816001"
+	var src= "http://steamcommunity.com/sharedfiles/filedetails/?id=358583033"
 	return S({notes},
 		T({margin: "-1.5em 0 0"}, "You probably know this but"),
 		A0(null,
 			H({size: 2}, "Stuff goes in")),
 		A1(null,
 			A2(null,
-				iframe({
-					src,
-					height:"600px",
-					width: "90%",
-					transform: "scale(0.4)"})),
+				iframe({src})),
 			H({size: 2},
 				"Stuff comes out",
-				A3({span: true}, " (eventually)"))))
+				A3(span, " (eventually)"))))
 }()
 
 var resources101= (notes)=> {
@@ -281,144 +332,163 @@ var resources101= (notes)=> {
 		A0(null,
 			H({size: 3}, "It's just resources")),
 		A1(null,
-			T(null, "(things with URLs)")),
+			T(null, "(things with URLs, running somewhere)")),
 		A2(null,
-			blockQuote(null,
-				quote(null,
+			blockQuote({bgColor: "black"},
+				quote(smallQuote,
 					"\"A ",
-					b(null, "subscription resource"),
+					ib(null, "subscription resource"),
 					" is used to receive messages from a subscription and to delete a subscription.\""),
-				cite(
-					ssl(2)))),
-		A3(null,
-			blockQuote(null,
-				quote(null,
-					"\"A ",
-					b(null, "push resource"),
-					" is used to send messages to a subscription.\"")),
 				cite(null,
-					ssl(2, "Overview"))))
+					ssl(2, "Overview", true)))),
+		A3(null,
+			blockQuote({bgColor: "black"},
+				quote(smallQuote,
+					"\"A ",
+					ib(null, "push resource"),
+					" is used to send messages to a subscription.\""),
+				cite(null,
+					ssl(2, "Overview", true)))))
+}()
+
+var _legoPortal= "http://steamcommunity.com/sharedfiles/filedetails/?id=258816001"
+var prettySimple= (notes)=> {
+	var src= _legoPortal
+	return S({notes},
+		H({size: 3}, "Pretty simple"),
+		iframe({src}),
+		T(null,
+			"With only one little not-magic technique involved ",
+			A0({span: true}, "(push)")),
+		A1(null, "c/o HTTP2"))
 }()
 
 var pushService= (notes)=> {
 	return S({notes},
 		T(null,
-			"These resources are gotten from a ",
-			b(null, "push service"),
+			"These two resources are gotten from a ",
+			ib(null, "push service"),
 			":"),
-		A0(null, blockQuote(null,
+		A0(null, blockQuote(black,
 			quote(null,
-				"This resource is used to create",
-				b(null, "push message subscriptions")),
+				"This resource is used to create ",
+				ib(null, "push message subscriptions")),
 			cite(null,
-				ssl(2,1, "HTTP Resources")))))
+				ssl(2.1, "HTTP Resources", true)))))
 }()
 
 var create= (notes)=> {
 	return S({notes},
-		T(null, "Let's jump in"),
+		T(null, "Let's jump in,"),
+		T(null,
+			"and get that push message subscription ",
+			A0(null,
+				"(queue)")),
 		H(null, "Step 1"),
 		A0(null,
-			H({size: 3}, "Create a queue")),
+			H({size: 3}, "Create a queue:")),
 		A1(null,
-			T(null, "Call the Push Service")))
+			T(null, "POST to the Push Service")))
 }()
 
-var subscribeRequest= (notes)=> {
-	var source= `POST /subscribe/ HTTP/1.1
+var _subscribeRequest= `POST /subscribe/ HTTP/1.1
 Host: yoyodyne.net`
+var subscribeRequest= (notes)=> {
+	var source= _subscribeRequest
 	var href= ss("4")
 	return S({notes},
 		H({size: 3}, "Step 1: Create a queue"),
-		code({source, language: "http"}),
+		code({source: _subscribeRequest, language: "http"}),
 		ssl(4),
 		A0(null,
 			H({size: 3}, "Simple enough?")))
 }()
 
-var subscribeReply= (notes)=> {
-	var source= `HTTP/1.1 201 Created
+var _subscribeResponse= `HTTP/1.1 201 Created
 Date: Thu, 11 Dec 2014 23:56:52 GMT
 Link: </p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV>;
 	rel="urn:ietf:params:push"
 Link: </receipts/xjTG79I3VuptNWS0DsFu4ihT97aE6UQJ>;
 	rel="urn:ietf:params:push:receipt"
 Location: https://push.example.net/s/LBhhw0OohO-Wl4Oi971UGsB7sdQGUibx`
+var subscribeResponse= (notes)=> {
 	return S({notes},
 		H({size: 3},
 			"Step 1: Create a queue",
-			A0(null, " results")),
+			A0(span, " results")),
 		A0(null,
-			code({source, language: "http"}),
+			code({source: _subscribeResponse, language: "http"}),
 			ssl(4)),
 		A1(null, 
 			T(null, "We get three resources:")),
-		A2(null,
-			L(null,
-				LI(null, A2(null, "A way to push stuff in (push resource)")),
-				LI(null, A3(null, "Also, means to hear acks (receipt subscribe resource)")),
-				LI(null, A4(null, "A means to get stuff out (subscription resource)")))))
+		list(null,
+			LI(null, A2(null, "A way to push stuff in (push resource)")),
+			LI(null, A3(null, "Also, means to hear acks (receipt subscribe resource)")),
+			LI(null, A4(null, "A means to get stuff out (subscription resource)"))))
 }()
 
 var queueCreated= (notes)=> {
 	return S({notes},
-		T(null, "With these resources created, we have a queue"),
+		T(null, "With these resources created, we have a queue."),
 		T(null, "Maybe we want to start listening,"),
 		T(null, "Maybe we want to push."),
-		T(null, "It's a queue: order doesn't matter"))
+		T(null, "It's a queue: order ought not matter"))
 }()
 
 var pushNow= (notes)=> {
 	return S({notes},
+		T(null, "So picking randomly,..."),
 		H(null,
 			"Push. ",
 			A0(null,
 				"Push ",
-				i(null, "now"))))
+				ib(null, "now."))))
 }()
 
 var p= (notes)=> {
 	return S({notes},
-		blockQuote(null,
-			quote(null,
-				"An application server requests the delivery of a push message by ",
+		blockQuote(black,
+			quote(smallQuote,
+				"An [pusher] requests the delivery of a push message by ",
 				"sending a HTTP request to a push resource distributed to the ",
-   				"application server by a user agent.  The push message is included in ",
+				"[pushee] by a [queue creator].  The push message is included in ",
    				"the body of the request."),
 			cite(null,
-				ssl(6, "Requesting Push Message Delivery"))),
+				ssl(6, "Requesting Push Message Delivery", true))),
 		T(null, "And that looks like..."))
 }()
 
-var pRequest= (notes)=> {
-	var source= `POST /p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV HTTP/1.1
+var _pRequest= `POST /p/JzLQ3raZJfFBR0aqvOMsLrt54w4rJUsV HTTP/1.1
 Host: push.example.net
 Content-Type: text/plain;charset=utf8
 Content-Length: 36
 
 iChYuI3jMzt3ir20P8r_jgRR-dSuN182x7iB`
+var pRequest= (notes)=> {
 	return S({notes},
-		code({source, language: "http"}),
+		code({source: _pRequest, language: "http"}),
 		ssl(6, "Requesting Push Message Delivery request"),
 		T(null,
 			"So we're POST'ing to the ",
-			b(null, "push resource"),
+			ib(null, "push resource"),
 			"."))
 }()
 
-var pResponse= (notes)=> {
-	var source= `HTTP/1.1 201 Created
+var _pResponse= `HTTP/1.1 201 Created
 Date: Thu, 11 Dec 2014 23:56:55 GMT
 Location: https://push.example.net/d/qDIYHNcfAIPP_5ITvURr-d6BGtYnTRnk`
+var pResponse= (notes)=> {
 	return S({notes},
-		code({source, language: "http"}),
+		code({source: _pResponse, language: "http"}),
 		ssl(6, "Requesting Push Message Delivery response"),
 		T(null,
-			"We get back a",
-			b(null, "push message resource"),
+			"We get back a ",
+			ib(null, "push message resource"),
 			"."),
 		T(null,
-			"With an address the sender can look for a receipt of."))
+			"With an address the sender can look for a receipt of."),
+		T(null,
+			"(Well come back to receipts latter)"))
 }()
 
 var pExtra= (notes)=> {
@@ -427,24 +497,21 @@ var pExtra= (notes)=> {
 			"Pushers ",
 			i(null, "may"),
 			" also:"),
-		L(null,
-			LI(null,
-				A0(null,
-					blockQuote(null,
-						quote(null,
-							"An [pusher] can use the Push-Receipt header field to ",
-							"request a confirmation from the push service when a push message is ",
-							"delivered and acknowledged by [a listener]"),
-						cite(null,
-							ssl(6.1, "Requesting Push Message Receipts"))))),
-			LI(null,
-				A1(null,
-					blockQuote(null,
-						quote(null,
-							"A [pusher] can use the TTL header field to limit the time ",
-							"that a push message is retained by a push service."),
-						cite(null,
-							ssl(6.2, "Push Message Time-To-Live")))))))
+		A0(null,
+			blockQuote(black,
+				quote(smallQuote,
+					"An [pusher] can use the Push-Receipt header field to ",
+					"request a confirmation from the push service when a push message is ",
+					"delivered and acknowledged by [a listener]"),
+				cite(null,
+					ssl(6.1, "Requesting Push Message Receipts", true)))),
+		A1(null,
+			blockQuote(black,
+				quote(smallQuote,
+					"A [pusher] can use the TTL header field to limit the time ",
+					"that a push message is retained by a push service."),
+				cite(null,
+					ssl(6.2, "Push Message Time-To-Live", true)))))
 }()
 
 var pRequest2= (notes)=> {
@@ -462,22 +529,108 @@ iChYuI3jMzt3ir20P8r_jgRR-dSuN182x7iB`
 		T(null,
 			"Two new footers at the bottom, see?"),
 		T(null,
-			"TTL is easy enough."),
+			ib(null, "TTL"),
+			" is easy enough. It's a time, in seconds, for the queue to hold a message."),
 		A0(null,
-			"And Push-Receipts is the url from /subscribe/"),
+			T(null,
+				"And ",
+				ib(null, "Push-Receipts"),
+				" says who to notify when the message gets acked")),
 		A1(null,
-			"It says who to notify when the message gets acked"))
+			T(null,
+				"That requires using subscribe's ",
+				ib(null, "receipt subscribe"),
+				" to get a ",
+				ib(null, "receipt subscription"),
+				".")))
 }()
 
+var _receiptRequest= `POST /receipts/xjTG79I3VuptNWS0DsFu4ihT97aE6UQJ HTTP/1.1
+Host: push.example.net`
+var _receiptResponse= `HTTP/1.1 201 Created
+Date: Thu, 11 Dec 2014 23:56:52 GMT
+Location: https://push.example.net/r/3ZtI4YVNBnUUZhuoChl6omUvG4ZM9mpN`
+var receiptSubscription= (notes)=> {
+	return S({notes},
+		blockQuote(black,
+			quote(smallQuote,
+				"A [pusher] requests the creation of a ",
+				ib(null, "receipt subscription "),
+				"by sending a HTTP POST request to the ",
+				ib(null, "receipt subscribe resource")),
+			cite(null,
+				ssl(5, "Subscribing for Push Message Receipts", true))),
+		A0(null,
+			code({source: _receiptRequest})),
+		A1(null,
+			code({source: _receiptResponse})))
+}()
+
+var individualClients= (notes)=> {
+	return S({notes},
+		H({size: 3},
+			"Kind of complex,"),
+		A0(null,
+			T(null, "This is for late bindings, so the queue can hand out stable, per-subscription /receipts")),
+		A1(null,
+			T(null, "But pushers get their receipts aggregated into a smaller set of /r's")))
+}()
+
+var pushRecap= (notes)=> {
+	var ts= "1.4rem"
+	return S({notes},
+		H({size: 3}, "Pushing recap"),
+		layout(null,
+			fit({textSize: ts},
+				H({size: 4}, "Subscription"),
+				code({source: _subscribeRequest, textSize: ts, fontSize: ts}),
+				code({source: _subscribeResponse, textSize: ts})),
+			fit(null,
+				H({size: 4}, "Receipt Subscription"),
+				code({source: _receiptRequest, textSize: ts}),
+				code({source: _receiptResponse, textSize: ts})),
+			fit(null,
+				H({size: 4}, "Push data"),
+				code({source: _pRequest, textSize: ts}),
+				code({source: "ok", textSize: ts}))))
+}()
+
+var pushRecap1= (notes)=> {
+	var ts= "1.4rem"
+	return S({notes},
+		H({size: 3}, "Pushing recap: subscription"),
+		code({source: _subscribeRequest, textSize: ts, fontSize: ts}),
+		code({source: _subscribeResponse, textSize: ts}))
+}()
+
+var pushRecap2= (notes)=> {
+	var ts= "1.4rem"
+	return S({notes},
+		H({size: 3}, "Pushing recap: receipt subscription"),
+		code({source: _receiptRequest, textSize: ts}),
+		code({source: _receiptResponse, textSize: ts}))
+}()
+
+var pushRecap3= (notes)=> {
+	var ts= "1.4rem"
+	return S({notes},
+		H({size: 3}, "Pushing recap: push"),
+		code({source: _pRequest, textSize: ts}),
+		code({source: "[no reply]", textSize: ts}))
+}()
 
 
 var sendingEasy= (notes)=> {
 	return S({notes},
 		T(null, "Whew,..."),
-		H({size: 3}, "Sending wasn't so bad."),
+		H({size: 3},
+			"Sending wasn't ",
+			i(null, "so"),
+			" bad."),
 		A0(null,
 			T(null, "Receiving?")))
 }()
+
 
 var queuesAndCubes= (notes)=> {
 	
@@ -498,204 +651,496 @@ render(
 			{httpMagic}
 			{probablyGreat}
 			{probablyGreat2}
+			{otherWeb}
+
 			{overview}
 			{model}
 			{goesInGoesOut}
 			{resources101}
+			{prettySimple}
 			{pushService}
+			{order(1)()}
 			{create}
 			{subscribeRequest}
-			{subscribeReply}
+			{subscribeResponse}
 			{queueCreated}
+
 			{pushNow}
 			{p}
 			{pRequest}
 			{pResponse}
 			{pExtra}
 			{pRequest2}
+			{receiptSubscription}
+			{individualClients}
+			{pushRecap1}
+			{pushRecap2}
+			{pushRecap3}
 			{sendingEasy}
+
+			{
+				/* RECIEVING SEQUENCE */
+			}
+			{
+				S(null,
+					Hbf(null, "Receiving"),
+					T(null, "The pull sequence,"),
+					T(null, "with a brief interlude on"),
+					H({size: 3}, "HTTP2 and Push"),
+					T(null, "(Which is ok if you don't yet know!)"))
+			}
+			{
+				S(null,
+					H(null,
+						"To pull queued data, we GET"),
+					T(null,
+						"On the Location: returned by /subscribe/"),
+					H({size: 3},
+						A0(null,
+							"The ",
+							ib(null,
+								"push message subscription"))))
+			}
+			{
+				S(null,
+					H({size: 3},
+						"GET'ting the push message subscription"),
+					T(null,
+						"doesn't do anything."),
+					H(null,
+						"The server does not respond."),
+					T(null,
+						A0(span,
+							"The request is left open.")),
+					T(null,
+						A1(span,
+							"But since this is HTTP2 nothing blocks")))
+			}
+			{
+				S(null,
+					H({size: 3},
+						"A null resource... ",
+						A0(span,
+							" kind of.")),
+					T(null,
+						"The request doesn't terminate,"),
+					T(null,
+						"It just hangs out, open,"),
+					T(null,
+						"But it signals to the server"),
+					H(null,
+						"That it ought push."))
+			}
+			{
+				S(null,
+					H(null,
+						"Push"),
+					T(null,
+						"And that brings us to HTTP2"),
+					T(null,
+						"Which provides push"))
+			}
 			
 
+			{
+				/* HTTP SEQUENCE */
+				S(null,
+					Hbf(null, "HTTP2"),
+					T(null, "Intermission"))
+			}
+			{
+				order(2)()
+			}
+			{
+				S(null,
+					Hbf(null, "A super fast intro to HTTP2"))
+			}
+			{
+				S(null,
+					H({size: 4},
+						"HTTP2 is about frames"),
+					T(null,
+						A0(span, "It is a messaging protocol")),
+					T(null,
+						A1(span,"For a HTTP")),
+					T(null,
+						A2(span, "Which is a request response message protocol")))
+			}
+			{
+				S(null,
+					H(null, "What does messaging protocol mean?"),
+					H({size: 3}, "Frames?"),
+					blockQuote(black,
+						quote(smallQuote,
+							"The basic protocol unit in HTTP/2 is a frame (",
+							http2(4.1, "Frame Format"),
+							").  Each ",
+							"frame type serves a different purpose.  For example, HEADERS and DATA ",
+							"frames form the basis of HTTP requests and responses (",
+							http2(8.1, "HTTP Request/Response Exchange"),
+							")",
+						cite(null,
+							http2(2, "HTTP2 Overview", true)))),
+					T(null,
+						"Client and server send frames, ",
+						"belonging to streams- which are like ",
+						"conversations happening across the connection"))
+			}
+			{
+				S(null,
+					Hbf(null, "But it's more than HTTP in frames"),
+					T(null,
+						A0(span, "And more than I'm going over here, "),
+						A1(span,
+							"cause it's big. Too much awesome! "),
+						A2(span,
+							"Too much awesome & too much stream control, ",
+							"which you just gotta do")),
+					H(null,
+						"It's messaging. Many conversations/streams, at once."),
+					T(null,
+						"That's new!"))
+			}
+			{
+				S(null,
+					Hbf(null, "When you have streams you have"),
+					Hbf(null, "decisions on what to send"),
+					T(null,
+						"You (implicitly or explicitly) are picking which packets to push"),
+					T(null,
+						A0(span,
+							"(\"Good problems to have\")")),
+					T(null,
+						"This is much more than request/response"))
+			}
+			{
+				S(null,
+					T(null,
+						A0(span,"One of those server-sent frames:")),
+					H({size:2},
+						A1(span, "PUSH_PROMISE")))
+			}
+			{
+				S(null,
+					H({size:2}, "PUSH_PROMISE:"),
+					H(null, "\"I am going to send you a stream\""),
+					T(null, "Inside is just content"),
+					A0(null,
+						T(null, "Conceptually, an unasked for GET")))
+			}
+			{
+				S(null,
+					H({size:3}, "HTTP2 is novel bi-directional & asynchronous communication"))
+			}
+
+			{
+				S(null,
+					T(null, "Ok, back to "),
+					H(null,
+						"GET /s/example-push-message-subscription"),
+					T(null,
+						"This request is hanging open,"),
+					T(null,
+						"We've just learned about PUSH_PROMISE"),
+					T(null,
+						"And that's what the server starts dequeuing across"))
+			}
+			{
+				S(null,
+					blockQuote(black,
+						quote(null,
+							"[WebPush] uses HTTP/2 ",
+							"server push [HTTP2 RFC7540] to send the contents of push messages as they ",
+							"are sent by application servers."),
+						cite(null,
+							ssl(7, "Receiving Push Messages for a Subscription", true))),
+					T(null,
+						"(as they are sent meaning 'the same content, eventually')"))
+			}
+			{
+				S(null,
+					code({source: `PUSH_PROMISE [stream 7; promised stream 4] +END_HEADERS
+  :method     = GET
+  :path       = /d/qDIYHNcfAIPP_5ITvURr-d6BGtYnTRnk
+  :authority  = push.example.net
+HEADERS      [stream 4] +END_HEADERS
+  :status        = 200
+  :link          = </p/some-msg>; rel="urn:ietf:params:push"
+DATA         [stream 4] +END_STREAM
+  iChYuI3jMzt3ir20P8r_jgRR-dSuN182x7iB`}),
+					ssl(7, "Receiving Push Messages for a Subscription"))
+			}
+			{
+				S(null,
+					H(null,
+						"Content in, content out"),
+					H(null,
+						A0(span,
+							iframe({src: "http://steamcommunity.com/sharedfiles/filedetails/?id=563287795"}),
+							H({size: 3}, "Win!"))))
+			}
+
+			{
+				/* RECEIPTS */
+			}
+			{
+				S(null,
+					H(null,
+						"This is the base of WebPush Protocol"),
+					H({size: 3},
+						"There's also receipts"),
+					T(null,
+						"So everyone can be sure of the push win"),
+					A0(null,
+						T(null,
+							"From the previous PUSH_PROMISE:"),
+						code({source: `PUSH_PROMISE [stream 7; promised stream 4] +END_HEADERS
+  :method        = GET
+  :path          = /d/qDIYHNcfAIPP_5ITvURr-d6BGtYnTRnk`})),
+						T(null,
+							"Path is a ",
+							ib(null, "push message resource"),
+							","))
+			}
+			{
+				S(null,
+					T(null,
+						"Two components-"),
+					H({size: 3},
+						"Receipts- pushee notifying the queue"),
+					blockQuote(black,
+						quote(smallQuote,
+							"The [pusher] MUST acknowledge receipt of the message ",
+							"by performing a HTTP DELETE on the push message resource."),
+						cite(null,
+							ssl(7.2, "Acknowledge Push Messages", true))))
+			}
+			{
+				S(null,
+					T(null,
+						"Two components-"),
+					H({size: 3},
+						"Receipts: queue notifying the pusher"),
+					blockQuote(black,
+						quote(smallQuote,
+							"The [pusher] requests the delivery of receipts from the ",
+							"push service by making a HTTP GET request to the receipt subscription ",
+							"resource.  The push service does not respond to this request, it ",
+							"instead uses HTTP/2 server push to send push receipts when ",
+							"messages are acknowledged (Section 7.2) by the user agent. ",
+							"Each receipt is pushed as the response to a synthesized GET request ",
+							"sent in a PUSH_PROMISE.  This GET request is made to the same push ",
+							"message resource that was created by the push service when the ",
+							"application server requested message delivery."),
+						cite(null,
+							ssl(7.3, "Receiving Push Message Receipts"))))
+			}
+			{
+				S(null,
+					H({size: 3},
+						"Message receipts"),
+					code({source: `DELETE /d/qDIYHNcfAIPP_5ITvURr-d6BGtYnTRnk HTTP/1.1
+Host: push.example.net`}),
+					ssl(7.2, "Acknowledge Push Messages"),
+					code({source:`HEADERS      [stream 13] +END_STREAM +END_HEADERS
+:method        = GET
+:path          = /r/3ZtI4YVNBnUUZhuoChl6omUvG4ZM9mpN
+:authority     = push.example.net`}),
+					code({source: `PUSH_PROMISE [stream 13; promised stream 82] +END_HEADERS
+:method        = GET
+:path          = /d/qDIYHNcfAIPP_5ITvURr-d6BGtYnTRnk
+:authority     = push.example.net`}),
+					ssl(7.3, "Receiving Push Message Receipts"))
+			}
+			{
+				S(null,
+					H(null,
+						"Two PUSH_PROMISE uses,"),
+					list(null,
+						LI(null,
+							"Listening for messages"),
+						LI(null,
+							"Listening for receipts")))
+			}
+			{
+				S(null,
+					H(null,
+						"WebPush Protocol"),
+					img({src: "/assets/webpush.png"}))
+			}
 
 
-			<Slide>
-				<Heading>[this] Great</Heading>
-				<iframe src=""></iframe>
-			</Slide>
-			<Slide>
-				So we're going to do it like this
-			</Slide>
-			<Slide>
-				http://steamcommunity.com/sharedfiles/filedetails/?id=563287795
-			</Slide>
-			<Slide>
-				This presentation also has
-			</Slide>
-			<Slide>
-				<Heading big>HTTP2</Heading>
-			</Slide>
-			<Slide>
-				<Appear fid={1}>
-					<Text>Which delivers resources</Text>
-				</Appear>
-				<Text>Which is great</Text>
-			</Slide>
-			<Slide>
-			</Slide>
-			<Slide>
-				<Appear fid={1}>
-					<Text>HTTP is great at delivering resources</Text>
-				</Appear>
-				<Appear fid={2}>
-					<Text>And delivering resources is what we want</Text>
-				</Appear>
-				<Appear fid={3}>
-					<Text>Cause, that's the queue working</Text>
-				</Appear>
-			</Slide>
-			<Slide>
-				HTTP2 is kind of
-			</Slide>
-			<Slide>
-				<Appear fid={1}>
-					<Heading big>HTTP2</Heading>
-					<Heading>is kind of</Heading>
-				</Appear>
-				<Appear fid={2}>
-					Companion Cube
-				</Appear>
-				http://steamcommunity.com/sharedfiles/filedetails/?id=563287795
-			</Slide>
-			<Slide>
-				So it's kind of all
-			</Slide>
-			<Slide>
-				
-			</Slide>
-			
-			
-			<Slide>
-				
-			</Slide>
-			<Slide>
-				<Heading size={0.8}>
-					That s kind of like a talk on
-				</Heading>
-				<Text>
-					Portals
-				</Text>
-			</Slide>
-			<Slide transition={["zoom"]} bgColor="primary" notes="">
-				<Heading size={1} fit caps lineHeight={1} textColor="black">
-					Spectacle
-				</Heading>
-				<Heading size={1} fit caps>
-					A ReactJS Presentation Library
-				</Heading>
-				<Heading size={1} fit caps textColor="black">
-					Where You Can Write Your Decks In JSX
-				</Heading>
-				<Link href="https://github.com/FormidableLabs/spectacle">
-					<Text bold caps textColor="tertiary">View on Github</Text>
-				</Link>
-				<Text textSize="1.5em" margin="20px 0px 0px" bold>Hit Your Right Arrow To Begin!</Text>
-			</Slide>
-			<Slide transition={["slide"]} bgColor="black" notes="You can even put notes on your slide. How awesome is that?">
-				<Image src={images.kat.replace("/", "")} margin="0px auto 40px" height="293px"/>
-				<Heading size={1} fit textColor="primary" textFont="secondary">
-					Wait what?
-				</Heading>
-			</Slide>
-			<Slide transition={["zoom", "fade"]} bgColor="primary" notes="<ul><li>talk about that</li><li>and that</li></ul>">
-				<CodePane
-					lang="jsx"
-					source={require("raw!./assets/deck.example")}
-					margin="20px auto"
-				/>
-			</Slide>
-			<Slide transition={["slide"]} bgImage={images.city.replace("/", "")} bgDarken={0.75}>
-				<Appear fid="1">
-					<Heading size={1} caps fit textColor="primary">
-						Full Width
-					</Heading>
-				</Appear>
-				<Appear fid="2">
-					<Heading size={1} caps fit textColor="tertiary">
-						Adjustable Darkness
-					</Heading>
-				</Appear>
-				<Appear fid="3">
-					<Heading size={1} caps fit textColor="primary">
-						Background Imagery
-					</Heading>
-				</Appear>
-			</Slide>
-			<Slide transition={["zoom", "fade"]} bgColor="primary">
-				<Heading caps fit>Flexible Layouts</Heading>
-				<Layout>
-					<Fill>
-						<Heading size={4} caps textColor="secondary" bgColor="white" margin={10}>
-							Left
-						</Heading>
-					</Fill>
-					<Fill>
-						<Heading size={4} caps textColor="secondary" bgColor="white" margin={10}>
-							Right
-						</Heading>
-					</Fill>
-				</Layout>
-			</Slide>
-			<Slide transition={["slide"]} bgColor="black">
-				<BlockQuote>
-					<Quote>Wonderfully formatted quotes</Quote>
-					<Cite>Ken Wheeler</Cite>
-				</BlockQuote>
-			</Slide>
-			<Slide transition={["spin", "zoom"]} bgColor="tertiary">
-				<Heading caps fit size={1} textColor="primary">
-					Inline Markdown
-				</Heading>
-				<Markdown>
-					{`
-![Markdown Logo](${images.markdown.replace("/", "")})
+			{
+				/* PUSH API */
+				order(3)()
+			}
+			{
+				S(null,
+					H(null,
+						"Push API"),
+					H({size: 3},
+						"The client side API that preciptated WebPush Protocol"),
+					A0(null,
+						blockQuote(black,
+							quote(smallerQuote,
+								"The Push API provides webapps with scripted access to server-sent ",
+								"messages, for simplicity referred to here as push messages, as ",
+								"delivered by push services. A push service allows an application server ",
+								"to send messages to a webapp, regardless of whether the webapp is currently ",
+								"active on the user agent. The push message will be delivered to a Service ",
+								"Worker, which could then store the message's data or display a notification to the user."),
+							cite(null,
+								L({href: "http://www.w3.org/TR/push-api/#abstract", textColor: primary.textColor},
+									"http://www.w3.org/TR/push-api/#abstract")))))
+			}
+			{
+				S(null,
+					H(null,
+						"Push API"),
+					img({src: "/pushapi.png", width: "75%"}))
+			}
+			{
+				S(null,
+					layout(null,
+						fit(null,
+							img({src: "/webpush.png"})),
+						fill(null,
+							img({src: "/pushapi.png", height:"580px"}))))
+			}
+			{
+				S(null,
+					H({size: 3},
+						"Identical flows"),
+					list(null,
+						LI(null,
+							A0(span,
+								"WebPush Protocol is the web queue")),
+						LI(null,
+							A1(span,
+								"Push API is the browser interface"))))
+			}
+			{
+				S(null,
+					H(null, "Push API"),
+					H({size: 3},
+						"used within ServiceWorkerGlobalScope"),
+					code({source: `// https://example.com/serviceworker.js
+this.onpush = function(event) {
+  console.log(event.data);
+  // From here we can write the data to IndexedDB, send it to any open
+  // windows, display a notification, etc.
+}`}),
+					L({href:"http://www.w3.org/TR/push-api/#example", textColor: primary.textColor}, "- http://www.w3.org/TR/push-api/#example"))
+			}
 
-You can write inline images, [Markdown Links](http://commonmark.org), paragraph text and most other markdown syntax
-* Lists too!
-* With ~~strikethrough~~ and _italic_
-* And lets not forget **bold**
-					`}
-				</Markdown>
-			</Slide>
-			<Slide transition={["slide", "spin"]} bgColor="primary">
-				<Heading caps fit size={1} textColor="tertiary">
-					Smooth
-				</Heading>
-				<Heading caps fit size={1} textColor="secondary">
-					Combinable Transitions
-				</Heading>
-			</Slide>
-			<Slide transition={["fade"]} bgColor="secondary" textColor="primary">
-				<List>
-					<ListItem><Appear fid="1">Inline style based theme system</Appear></ListItem>
-					<ListItem><Appear fid="2">Autofit text</Appear></ListItem>
-					<ListItem><Appear fid="3">Flexbox layout system</Appear></ListItem>
-					<ListItem><Appear fid="4">React-Router navigation</Appear></ListItem>
-					<ListItem><Appear fid="5">PDF export</Appear></ListItem>
-					<ListItem><Appear fid="6">And...</Appear></ListItem>
-				</List>
-			</Slide>
-			<Slide transition={["slide"]} bgColor="primary">
-				<Heading size={1} caps fit textColor="tertiary">
-					Your presentations are interactive
-				</Heading>
-				<Interactive/>
-			</Slide>
-			<Slide transition={["spin", "slide"]} bgColor="tertiary">
-				<Heading size={1} caps fit lineHeight={1.5} textColor="primary">
-					Made with love in Seattle by
-				</Heading>
-				<Link href="http://www.formidablelabs.com"><Image width="100%" src={images.logo}/></Link>
-			</Slide>
+			{
+				/* implementation */
+				order(4)()
+			}
+			{
+				S(null,
+					H({size: 3}, "Implementation"),
+					H(null, "WebPush Pump"),
+					T(null, "Node powered resource-oriented implementation"),
+					H({size: 4},
+						L({href: "https://github.com/rektide/webpush-pump"},
+							"https://github.com/rektide/webpush-pump")))
+			}
+			{
+				S(null,
+					H({size: 3},
+						"I really like"),
+					H(null,
+						"Web Push's resource-orientation"),
+					T(null,
+						A0(span, "A lot of discrete resources")))
+			}
+			{
+				S(null,
+					H(null, "Context.js"),
+					T(null, "Resource container"),
+					code({source:`function Context( opts){
+	self.subscribe= {}
+	self.p= {}
+	self[ "push:receipt"]= {}
+	self.s= {}
+	self.d= {}`}),
+					T(null,
+						A0(span, "With deliberately uncreative naming")),
+					L({href: "https://github.com/rektide/webpush-pump/blob/master/Context.js"},
+						"https://github.com/rektide/webpush-pump/blob/master/Context.js"))
+			}
+			{
+				S(null,
+					T(null, "Req context- own growing container"),
+					code({textSize: "1.4rem", style: {"fontSize": "1.4rem"}, source: `function *subscribe(next){
+var reqCtx= this[ ctxName], // request container
+  ctx= reqCtx.ctx, // global container
+  _created
+if(!reqCtx.subscribe){
+	reqCtx.subscribe= _created= new Subscribe(reqCtx)
+	ctx.accept( _created) }
+if(!reqReqCtx.p){
+	reqCtx.push= _created= new P(reqCtx)
+	ctx.accept( _created) }
+if(!reqCtx.receipt){
+	reqCtx.receipt= _created= new Receipt(reqCtx)
+	ctx.accept( _created) }}`}))
+			}
+			{
+				S(null,
+					T(null, "Create all resources off request context"),
+					code({source: `_created = new Subscribe(reqCtx)`}),
+					T(null, "Add them to contexts"),
+					code({source: `reqCtx.push(_created); ctx.accept(_created)`}),
+					T(null,
+						A0(span, "Homogenous contracting, predictable interfaces")))
+			}
+			{
+				S(null,
+					H(null, "Views in Context"),
+					T(null, "MutationObserver maintained projections"),
+					code({source: `this.subscribeToS= projection(this.s, function( s){
+	return s.symbol // to all s for subscribe
+}, function(s){
+	return s.subscribe // map from s's subscribe
+})`}),
+					T(null, "Structure for looking up all s having a subscribe property"))
+			}
+			{
+				S(null,
+					H(null, "Symbols, symbols everywhere"),
+					T(null, "Supposedly the new, faster lookup"),
+					code({source: `function base(opts){
+	this.symbol= self.symbol|| opts&& opts.symbol|| Symbol()`}))
+			}
+
+			{
+				order(5)()
+			}
+			{
+				S(null,
+					H(null, "Push API is a significant advance"),
+					T(null, "Some imo nits-"),
+					T(null, "Pushes opaque, url-less blobs, would be nice to push resources"),
+					T(null, "Only way to get notified of HTTP2 Push events in the browser*"),
+					T(null,
+						A0(span, "(*Short of out-of band signalling (SSE))")))
+			}
+			{
+				S(null,
+					H({size: 3}, "Push can be a sigificant advance in the web"),
+					T(null, "And WebPush/Push API a solid first use"),
+					H(null, "But there will be much more!"))
+			}
+			{
+				S(null,
+					T(null,
+						"This was ",
+						ib(null, "WebPush Away")),
+					T(null, "I'm super happy to have gotten to share this with you!"),
+					Hbf(null, "The future is exciting!!"))
+			}
 		</Deck>
 	</Spectacle>
 , document.getElementById("root"));

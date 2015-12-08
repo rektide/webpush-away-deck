@@ -15,6 +15,12 @@ app.use(require("webpack-dev-middleware")(compiler, {
 
 app.use(require("webpack-hot-middleware")(compiler));
 
+app.get("*png", function(req, res){
+  var base = path.basename(req.url)
+  var file = path.join(__dirname, "assets", base)
+  res.sendFile(file)
+});
+
 app.get("*", function(req, res) {
   res.sendFile(path.join(__dirname, "index.html"));
 });
